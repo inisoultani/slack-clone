@@ -9,10 +9,14 @@ import { db } from '../firebase/config';
 import { selectedChannelId } from '../features/appSlice';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
+import { useDispatch } from 'react-redux';
+
+import { getMessagesByChannelIdThunk } from '../features/messagesSlice';
 
 const Chat = () => {
   const channelId = useSelector(selectedChannelId);
   const [roomName, setRoomName] = useState('');
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // const fetchChannelName = async (channelId) => {
@@ -27,7 +31,12 @@ const Chat = () => {
       ref
         .doc(channelId)
         .get()
-        .then((docRef) => setRoomName(docRef.data().name));
+        .then((docRef) => {
+          setRoomName(docRef.data().name);
+          // fetch all message related to selectedChannelId
+          // and populate the message in redux store
+          dispatch(getMessagesByChannelIdThunk(channelId));
+        });
 
       // v9 modular sdk
       // const snap = fetchChannelName(channelId);
@@ -37,7 +46,7 @@ const Chat = () => {
       //   console.log('channel name not found');
       // }
     }
-  }, [channelId]);
+  }, [channelId, dispatch]);
 
   return (
     <ChatContainerStyled>
@@ -52,7 +61,7 @@ const Chat = () => {
           </p>
         </HeaderRightStyled>
       </HeaderStyled>
-      <ChatMessage />
+      <ChatMessage channelId={channelId} />
       <ChatInput channelName={roomName} channelId={channelId} />
     </ChatContainerStyled>
   );
