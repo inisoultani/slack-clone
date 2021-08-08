@@ -1,10 +1,16 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { selectChannel as selectChannelAction } from '../features/appSlice';
 import { db } from '../firebase/config';
 
-const SidebarOption = ({ Icon, title, addChannelOption, id }) => {
+const SidebarOption = ({
+  Icon,
+  title,
+  addChannelOption,
+  id,
+  // selectChannelAction,
+}) => {
   const dispatch = useDispatch();
 
   const addChannel = () => {
@@ -19,7 +25,10 @@ const SidebarOption = ({ Icon, title, addChannelOption, id }) => {
 
   const selectChannel = () => {
     console.log('selectChannel');
-    dispatch(selectChannelAction(id));
+    if (id) {
+      dispatch(selectChannelAction(id));
+      // selectChannelAction(id);
+    }
   };
 
   return (
@@ -37,6 +46,13 @@ const SidebarOption = ({ Icon, title, addChannelOption, id }) => {
     </SidebarContainerStyle>
   );
 };
+
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     selectChannelAction: (id) => dispatch(selectChannelAction(id)),
+//   };
+// };
+// export default connect(null, mapDispatchToProps)(SidebarOption);
 
 export default SidebarOption;
 
