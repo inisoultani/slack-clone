@@ -4,9 +4,10 @@ import { Button } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 
 import { addMessage } from '../features/messagesSlice';
-import { db } from '../firebase/config';
+import { db, postConverter, timestamp } from '../firebase/config';
+import Message from '../actions/Message';
 
-const ChatInput = ({ channelName, channelId }) => {
+const ChatInput = ({ channelName, channelId, bottomRef, user }) => {
   const [text, setText] = useState('');
   const inputRef = useRef();
   const dispatch = useDispatch();
@@ -20,15 +21,27 @@ const ChatInput = ({ channelName, channelId }) => {
     console.log(`onsubmit : ${text}`);
 
     const ref = db.collection('channels');
-    ref.doc(channelId).collection('messages').add({
-      message: text,
-    });
-    dispatch(
-      addMessage({
-        channelId: channelId,
-        message: text,
+    const msg = new Message(text, timestamp, user.displayName, user.photoURL);
+    const prom = ref
+      .doc(channelId)
+      .collection('messages')
+      .withConverter(postConverter)
+      .add(msg);
+    prom.then((doc) =>
+      doc.get().then((doc) => {
+        msg.createdAt = doc.data().createdAt;
+        dispatch(
+          addMessage({
+            channelId: channelId,
+            message: msg,
+          }),
+        );
+        bottomRef.current.scrollIntoView({
+          behavior: 'smooth',
+        });
       }),
     );
+
     inputRef.current.value = '';
   };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import StarBorderOutlinedIcon from '@material-ui/icons/StarBorderOutlined';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
@@ -10,6 +10,8 @@ import { selectedChannelId } from '../features/appSlice';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import { useDispatch } from 'react-redux';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase/config';
 
 import { getMessagesByChannelIdThunk } from '../features/messagesSlice';
 
@@ -17,6 +19,8 @@ const Chat = () => {
   const channelId = useSelector(selectedChannelId);
   const [roomName, setRoomName] = useState('');
   const dispatch = useDispatch();
+  const bottomRef = useRef();
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
     // const fetchChannelName = async (channelId) => {
@@ -61,13 +65,21 @@ const Chat = () => {
           </p>
         </HeaderRightStyled>
       </HeaderStyled>
-      <ChatMessage channelId={channelId} />
-      <ChatInput channelName={roomName} channelId={channelId} />
+      <ChatMessage channelId={channelId} bottomRef={bottomRef} />
+      <ChatInput
+        channelName={roomName}
+        channelId={channelId}
+        bottomRef={bottomRef}
+        user={user}
+      />
+      <ChatBottomStyled ref={bottomRef} />
     </ChatContainerStyled>
   );
 };
 
 export default Chat;
+
+const ChatBottomStyled = styled.div``;
 
 const ChatContainerStyled = styled.div`
   flex: 0.7;

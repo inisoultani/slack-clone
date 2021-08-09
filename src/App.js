@@ -4,13 +4,13 @@ import { Router, Route, Switch } from 'react-router';
 import { createGlobalStyle } from 'styled-components';
 
 import './App.css';
-import CommentBox from './components/CommentBox';
-import CommentList from './components/CommentsList';
 import Header from './components/Header';
 import history from './history';
 import Sidebar from './components/Sidebar';
 import Chat from './components/Chat';
-
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from './firebase/config';
+import Login from './components/Login';
 const GlobalStyled = createGlobalStyle`
   html {
     --slack-color : #3f0f40;
@@ -19,22 +19,27 @@ const GlobalStyled = createGlobalStyle`
 `;
 
 function App() {
+  const [user, loading] = useAuthState(auth);
+
   return (
     <div className="App">
       <GlobalStyled />
       <Router history={history}>
-        <Header />
-
-        <AppBody>
-          <Sidebar />
-          <Switch>
-            <Route path="/" exact>
-              {/* <CommentBox />
-              <CommentList /> */}
-              <Chat />
-            </Route>
-          </Switch>
-        </AppBody>
+        {!user ? (
+          <Login />
+        ) : (
+          <React.Fragment>
+            <Header/>
+            <AppBody>
+              <Sidebar />
+              <Switch>
+                <Route path="/" exact>
+                  <Chat />
+                </Route>
+              </Switch>
+            </AppBody>
+          </React.Fragment>
+        )}
       </Router>
     </div>
   );
@@ -42,7 +47,7 @@ function App() {
 
 const AppBody = styled.div`
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 40px);
 `;
 
 export default App;

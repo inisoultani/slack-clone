@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import Message from '../actions/Message';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -11,9 +12,25 @@ const firebaseConfig = {
   measurementId: 'G-XB4JWZEC7L',
 };
 
+export const postConverter = {
+  toFirestore: (message) => {
+    return {
+      message: message.message,
+      createdAt: message.createdAt,
+      user: message.user,
+      userImage: message.userImage,
+    };
+  },
+  fromFirestore: (snapshot, options) => {
+    const data = snapshot.data(options);
+    return new Message(data.message, data.createdAt, data.user, data.userImage);
+  },
+};
+
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 const db = firebaseApp.firestore();
 const auth = firebaseApp.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
+const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-export { db, auth, provider };
+export { db, auth, provider, timestamp };

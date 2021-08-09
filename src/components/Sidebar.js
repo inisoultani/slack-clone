@@ -14,10 +14,13 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AddIcon from '@material-ui/icons/Add';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { db } from '../firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase/config';
 
 import SidebarOption from './SidebarOption';
 const Sidebar = () => {
   const [channels, loading, error] = useCollection(db.collection('channels'));
+  const [user] = useAuthState(auth);
 
   return (
     <SidebarContainerStyled>
@@ -26,7 +29,7 @@ const Sidebar = () => {
           <h2>Sultan HQ</h2>
           <h3>
             <FiberManualRecordIcon />
-            Muhammad Soultani
+            {user.displayName}
           </h3>
         </SidebarInfoStyled>
         <CreateIcon />
