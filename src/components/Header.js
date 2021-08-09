@@ -8,15 +8,15 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase/config';
 
 const Header = () => {
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
 
   return (
     <HeaderContainerStyled>
       <HeaderLeftStyled>
         <HeaderAvatarStyled
           onClick={() => auth.signOut()}
-          src={user.photoURL}
-          alt={user.displayName}
+          src={user?.photoURL}
+          alt={user?.displayName}
         />
         <AccessTimeIcon />
       </HeaderLeftStyled>

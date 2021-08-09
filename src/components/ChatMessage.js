@@ -1,16 +1,52 @@
-import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import hash from 'object-hash';
-import {
-  getMessageByChannelId,
-  getMessages,
-  getMessagesByChannelIdThunk,
-} from '../features/messagesSlice';
+import { getMessages } from '../features/messagesSlice';
+import { db, postConverter } from '../firebase/config';
+import { useDispatch } from 'react-redux';
+
+import { addMessage } from '../features/messagesSlice';
 
 const ChatMessage = ({ channelId = '', bottomRef }) => {
   // const selectorObj = getMessages);
   const messagesByChannelId = useSelector(getMessages);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // create new message listener for
+    // this specific chatmessage room
+    if (channelId) {
+      const unsub = db
+        .collection('channels')
+        .doc(channelId)
+        .collection('messages')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .withConverter(postConverter)
+        .onSnapshot((snap) => {
+          snap.forEach((doc) => {
+            // console.log('new data : ', doc.data());
+            // console.log('new data created at', doc.data().message);
+            if (doc.data().createdAt) {
+              // console.log('new data 2: ', doc.data());
+              dispatch(
+                addMessage({
+                  channelId: channelId,
+                  message: doc.data(),
+                }),
+              );
+
+              bottomRef.current.scrollIntoView({
+                behavior: 'smooth',
+              });
+            }
+          });
+        });
+
+      return () => unsub();
+    }
+  }, [channelId, dispatch, bottomRef]);
 
   const renderChatMessageList = (channelId) => {
     if (!messagesByChannelId[channelId]) {
@@ -35,16 +71,6 @@ const ChatMessage = ({ channelId = '', bottomRef }) => {
       );
     });
   };
-
-  useEffect(() => {
-    console.log(`channel id now : ${channelId}`);
-    setTimeout(() => {
-      bottomRef.current.scrollIntoView({
-        behavior: 'smooth',
-      });
-      console.log('view scrolled');
-    }, 2000);
-  }, [channelId, bottomRef]);
 
   return (
     <React.Fragment>

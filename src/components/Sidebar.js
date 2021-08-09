@@ -19,7 +19,7 @@ import { auth } from '../firebase/config';
 
 import SidebarOption from './SidebarOption';
 const Sidebar = () => {
-  const [channels, loading, error] = useCollection(db.collection('channels'));
+  const [channels] = useCollection(db.collection('channels'));
   const [user] = useAuthState(auth);
 
   return (
@@ -111,7 +111,3 @@ const SidebarInfoStyled = styled.div`
     color: green;
   }
 `;
-
-const SidebarGroupStyled = styled.div``;
-
-const SidebarChannelStyled = styled.div``;

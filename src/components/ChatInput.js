@@ -1,16 +1,13 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '@material-ui/core';
-import { useDispatch } from 'react-redux';
 
-import { addMessage } from '../features/messagesSlice';
 import { db, postConverter, timestamp } from '../firebase/config';
 import Message from '../actions/Message';
 
 const ChatInput = ({ channelName, channelId, bottomRef, user }) => {
   const [text, setText] = useState('');
   const inputRef = useRef();
-  const dispatch = useDispatch();
 
   const onSubmit = (event) => {
     event.preventDefault();
@@ -18,31 +15,17 @@ const ChatInput = ({ channelName, channelId, bottomRef, user }) => {
       return false;
     }
     // console.log(inputRef.current.value);
-    console.log(`onsubmit : ${text}`);
+    // console.log(`onsubmit : ${text}`);
 
-    const ref = db.collection('channels');
     const msg = new Message(text, timestamp, user.displayName, user.photoURL);
-    const prom = ref
+
+    db.collection('channels')
       .doc(channelId)
       .collection('messages')
       .withConverter(postConverter)
       .add(msg);
-    prom.then((doc) =>
-      doc.get().then((doc) => {
-        msg.createdAt = doc.data().createdAt;
-        dispatch(
-          addMessage({
-            channelId: channelId,
-            message: msg,
-          }),
-        );
-        bottomRef.current.scrollIntoView({
-          behavior: 'smooth',
-        });
-      }),
-    );
 
-    inputRef.current.value = '';
+    setText('');
   };
 
   return (

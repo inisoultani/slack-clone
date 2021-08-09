@@ -11,6 +11,7 @@ import Chat from './components/Chat';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase/config';
 import Login from './components/Login';
+import Loading from './components/Loading';
 const GlobalStyled = createGlobalStyle`
   html {
     --slack-color : #3f0f40;
@@ -21,6 +22,10 @@ const GlobalStyled = createGlobalStyle`
 function App() {
   const [user, loading] = useAuthState(auth);
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <div className="App">
       <GlobalStyled />
@@ -29,7 +34,7 @@ function App() {
           <Login />
         ) : (
           <React.Fragment>
-            <Header/>
+            <Header />
             <AppBody>
               <Sidebar />
               <Switch>

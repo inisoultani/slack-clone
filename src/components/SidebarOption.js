@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { selectChannel as selectChannelAction } from '../features/appSlice';
 import { db } from '../firebase/config';

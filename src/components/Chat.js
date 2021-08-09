@@ -12,7 +12,6 @@ import ChatInput from './ChatInput';
 import { useDispatch } from 'react-redux';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase/config';
-
 import { getMessagesByChannelIdThunk } from '../features/messagesSlice';
 
 const Chat = () => {
@@ -23,16 +22,9 @@ const Chat = () => {
   const [user] = useAuthState(auth);
 
   useEffect(() => {
-    // const fetchChannelName = async (channelId) => {
-    //   const docRef = doc(db, 'channels', channelId);
-    //   const snap = await getDoc(docRef);
-    //   return snap;
-    // };
-    const ref = db.collection('channels');
-    // .where('id', '==', 'JMxmKRZXNeLVGAPCUEw6');
     if (channelId) {
       // console.log(channelId);
-      ref
+      db.collection('channels')
         .doc(channelId)
         .get()
         .then((docRef) => {
@@ -41,14 +33,6 @@ const Chat = () => {
           // and populate the message in redux store
           dispatch(getMessagesByChannelIdThunk(channelId));
         });
-
-      // v9 modular sdk
-      // const snap = fetchChannelName(channelId);
-      // if (snap.exists()) {
-      //   setRoomName(snap.data().name);
-      // } else {
-      //   console.log('channel name not found');
-      // }
     }
   }, [channelId, dispatch]);
 

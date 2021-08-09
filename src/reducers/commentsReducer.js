@@ -1,12 +1,12 @@
-import { createReducer, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
-import Comment from "../actions/Comment";
-import { addComment, fetchCommentFromNet } from "../actions";
+import Comment from '../actions/Comment';
+import { addComment, fetchCommentFromNet } from '../actions';
 
 const initialState = [];
 
 const isActionStartWithComment = (action) => {
-  return action.type.startsWith("comment");
+  return action.type.startsWith('comment');
 };
 
 const actionReducerBuilder = (builder) => {
@@ -21,15 +21,15 @@ const actionReducerBuilder = (builder) => {
       state.push(new Comment(action.payload));
     })
     .addMatcher(isActionStartWithComment, (state, action) => {
-      console.log("matcher isActionStartWithComment", state);
+      console.log('matcher isActionStartWithComment', state);
     })
     .addDefaultCase((state, action) => {});
 };
 
-const commentReducer = createReducer(initialState, actionReducerBuilder);
+// const commentReducer = createReducer(initialState, actionReducerBuilder);
 
 const commentSlice = createSlice({
-  name: "comment",
+  name: 'comment',
   initialState,
   reducers: {},
   extraReducers: actionReducerBuilder,
