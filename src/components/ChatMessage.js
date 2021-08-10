@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import hash from 'object-hash';
@@ -12,6 +12,14 @@ const ChatMessage = ({ channelId = '', bottomRef }) => {
   // const selectorObj = getMessages);
   const messagesByChannelId = useSelector(getMessages);
   const dispatch = useDispatch();
+
+  const scrollToBottomAfterRender = useCallback(() => {
+    setTimeout(() => {
+      bottomRef.current?.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }, 250);
+  }, [bottomRef]);
 
   useEffect(() => {
     // create new message listener for
@@ -37,22 +45,20 @@ const ChatMessage = ({ channelId = '', bottomRef }) => {
                 }),
               );
 
-              bottomRef.current.scrollIntoView({
-                behavior: 'smooth',
-              });
+              scrollToBottomAfterRender();
             }
           });
         });
 
       return () => unsub();
     }
-  }, [channelId, dispatch, bottomRef]);
+  }, [channelId, dispatch, scrollToBottomAfterRender]);
 
   const renderChatMessageList = (channelId) => {
     if (!messagesByChannelId[channelId]) {
       return 'please select channel id';
     }
-    return messagesByChannelId[channelId].map((message) => {
+    const messageList = messagesByChannelId[channelId].map((message) => {
       // console.log(message);
       return (
         <li key={hash(message)}>
@@ -70,6 +76,9 @@ const ChatMessage = ({ channelId = '', bottomRef }) => {
         </li>
       );
     });
+
+    scrollToBottomAfterRender();
+    return messageList;
   };
 
   return (
